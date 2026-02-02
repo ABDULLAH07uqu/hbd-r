@@ -10,12 +10,22 @@
         canvas { position: fixed; top: 0; left: 0; z-index: 1; pointer-events: none; }
         .card { text-align: center; background: rgba(15, 15, 15, 0.95); padding: 40px; border-radius: 40px; border: 2px solid #ff4d6d; z-index: 10; position: relative; box-shadow: 0 0 40px #ff4d6d; width: 85%; max-width: 450px; }
         #name { font-family: 'Montserrat', sans-serif; font-size: 4rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px #ff4d6d; margin: 20px 0; height: 90px; letter-spacing: 5px; }
-        button { background: #ff4d6d; color: white; border: none; padding: 18px 50px; border-radius: 50px; font-size: 1.4rem; cursor: pointer; font-weight: bold; transition: 0.3s; position: relative; z-index: 100; }
+        button { background: #ff4d6d; color: #fff; border: none; padding: 18px 50px; border-radius: 50px; font-size: 1.4rem; cursor: pointer; font-weight: bold; position: relative; z-index: 100; transition: 0.3s; }
         .cake { width: 140px; height: 90px; background: #ff758f; margin: 20px auto; border-radius: 15px; position: relative; }
         .candle { width: 10px; height: 35px; background: gold; position: absolute; top: -35px; left: 65px; border-radius: 4px; }
         .flame { width: 14px; height: 22px; background: orange; position: absolute; top: -25px; left: -2px; border-radius: 50%; animation: pulse 0.1s infinite alternate; box-shadow: 0 0 15px orange; }
         @keyframes pulse { to { transform: scale(1.3); } }
-        #heart-msg { margin-top: 20px; font-size: 1.2rem; color: #ffccd5; display: none; line-height: 1.5; }
+        
+        /* الرسالة القلبية */
+        #heart-msg {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #ffccd5;
+            display: none;
+            line-height: 1.5;
+            animation: fadeIn 2s ease-in forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -25,76 +35,55 @@
         <div class="cake"><div class="candle"><div class="flame"></div></div></div>
         <div id="name"></div>
         <div id="heart-msg">
-            كل عام وأنتِ لقلبي مصدر النور.. ❤️<br> 
-            يا أغلى من سكن قلبي، ميلادك هو عيدي.
+            كل عام وأنتِ لقلبي مصدر النور، <br> 
+            كل عام وأنتِ لروحي الفرح.. <br>
+            يا أغلى من سكن قلبي، ميلادك هو عيدي. ❤️
         </div>
         <button id="b">اضغطي هنا يا ريناد 🎵</button>
     </div>
 
     <script>
-        const b = document.getElementById('b');
-        const d = document.getElementById('name');
-        const m = document.getElementById('heart-msg');
-        const c = document.getElementById('c');
-        const x = c.getContext('2d');
+        const b=document.getElementById('b'), d=document.getElementById('name'), m=document.getElementById('heart-msg'), c=document.getElementById('c'), x=c.getContext('2d');
         let parts = [];
-
-        c.width = window.innerWidth;
-        c.height = window.innerHeight;
+        c.width=window.innerWidth; c.height=window.innerHeight;
 
         function playSound() {
-            try {
-                const ac = new (window.AudioContext || window.webkitAudioContext)();
-                const notes = [261, 261, 293, 261, 349, 329, 261, 261, 293, 261, 392, 349];
-                let time = ac.currentTime;
-                notes.forEach(f => {
-                    let o = ac.createOscillator(), g = ac.createGain();
-                    o.frequency.value = f; g.gain.setValueAtTime(0.1, time);
-                    g.gain.exponentialRampToValueAtTime(0.0001, time + 0.4);
-                    o.connect(g); g.connect(ac.destination);
-                    o.start(time); o.stop(time + 0.5); time += 0.5;
-                });
-            } catch(e) { console.log("Audio Error"); }
+            const ac = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [261, 261, 293, 261, 349, 329, 261, 261, 293, 261, 392, 349];
+            let time = ac.currentTime;
+            notes.forEach(f => {
+                let o = ac.createOscillator(), g = ac.createGain();
+                o.frequency.value = f; g.gain.setValueAtTime(0.1, time);
+                g.gain.exponentialRampToValueAtTime(0.0001, time + 0.4);
+                o.connect(g); g.connect(ac.destination);
+                o.start(time); o.stop(time + 0.5); time += 0.5;
+            });
         }
 
-        b.addEventListener('click', function() {
+        b.onclick = () => {
             playSound();
             b.style.display = 'none';
             let n = "RENAD", i = 0;
-            const t = setInterval(() => {
+            const t = setInterval(() => { 
                 if(i < n.length) {
-                    d.innerHTML += n[i++];
+                    d.innerHTML += n[i++]; 
                 } else {
                     clearInterval(t);
-                    m.style.display = 'block';
+                    m.style.display = 'block'; // يظهر الرسالة بعد الاسم
                 }
             }, 500);
-
+            
             setInterval(() => {
-                for(let j=0; j<20; j++) {
-                    parts.push({
-                        x: Math.random()*c.width, 
-                        y: Math.random()*c.height, 
-                        dx: (Math.random()-0.5)*5, 
-                        dy: (Math.random()-0.5)*5, 
-                        cl: 'hsl('+Math.random()*360+',100%,50%)', 
-                        l: 60
-                    });
-                }
+                for(let j=0; j<25; j++) parts.push({x:Math.random()*c.width, y:Math.random()*c.height, dx:(Math.random()-0.5)*6, dy:(Math.random()-0.5)*6, cl:'hsl('+Math.random()*360+',100%,50%)', l:70});
             }, 500);
-            update();
-        });
-
-        function update() {
-            x.fillStyle = 'rgba(0,0,0,0.15)';
-            x.fillRect(0, 0, c.width, c.height);
-            parts.forEach((p, idx) => {
-                p.x += p.dx; p.y += p.dy; p.l--;
-                x.fillStyle = p.cl; x.beginPath(); x.arc(p.x, p.y, 2, 0, 7); x.fill();
-                if(p.l <= 0) parts.splice(idx, 1);
-            });
-            requestAnimationFrame(update);
-        }
+            
+            function u() {
+                x.fillStyle='rgba(0,0,0,0.15)'; x.fillRect(0,0,c.width,c.height);
+                parts.forEach((p,idx) => { p.x+=p.dx; p.y+=p.dy; p.l--; x.fillStyle=p.cl; x.beginPath(); x.arc(p.x,p.y,2.5,0,7); x.fill(); if(p.l<=0) parts.splice(idx,1); });
+                requestAnimationFrame(u);
+            }
+            u();
+        };
     </script>
 </body>
 </html>
