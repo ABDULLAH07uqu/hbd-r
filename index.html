@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBD RENAD</title>
+    <style>
+        body { margin: 0; background: #000; color: #ff4d6d; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: sans-serif; overflow: hidden; }
+        .card { border: 2px solid #ff4d6d; padding: 30px; border-radius: 20px; background: #0a0a0a; width: 80%; max-width: 400px; z-index: 10; }
+        #name { font-size: 4rem; font-weight: bold; margin: 20px 0; height: 80px; letter-spacing: 5px; color: #fff; text-shadow: 0 0 15px #ff4d6d; }
+        #msg { display: none; color: #ffccd5; font-size: 1.2rem; line-height: 1.6; margin-top: 15px; }
+        button { background: #ff4d6d; color: #fff; border: none; padding: 15px 30px; border-radius: 50px; font-size: 1.2rem; cursor: pointer; font-weight: bold; }
+        .heart { position: fixed; bottom: -10%; font-size: 20px; animation: fly 4s linear forwards; }
+        @keyframes fly { to { bottom: 110%; transform: translateX(50px) opacity(0); } }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div style="font-size: 50px;">🎂</div>
+        <div id="name"></div>
+        <div id="msg">
+            كل عام وأنتِ لقلبي مصدر النور، ❤️<br> 
+            يا أغلى من سكن قلبي، ميلادك هو عيدي. ✨
+        </div>
+        <button id="btn">اضغطي هنا يا ريناد 🎵</button>
+    </div>
+
+    <script>
+        const btn = document.getElementById('btn');
+        const nameDiv = document.getElementById('name');
+        const msgDiv = document.getElementById('msg');
+
+        btn.onclick = function() {
+            btn.style.display = 'none';
+            
+            // تشغيل صوت بسيط (Beep) لضمان العمل بدون روابط خارجية
+            const ac = new (window.AudioContext || window.webkitAudioContext)();
+            const playNote = (f, t) => {
+                const o = ac.createOscillator();
+                const g = ac.createGain();
+                o.frequency.value = f;
+                g.gain.setValueAtTime(0.1, t);
+                g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+                o.connect(g); g.connect(ac.destination);
+                o.start(t); o.stop(t + 0.5);
+            };
+            [261, 293, 329, 349, 392].forEach((f, i) => playNote(f, ac.currentTime + i * 0.5));
+
+            // كتابة الاسم
+            const name = "RENAD";
+            let i = 0;
+            const timer = setInterval(() => {
+                if(i < name.length) {
+                    nameDiv.innerHTML += name[i++];
+                } else {
+                    clearInterval(timer);
+                    msgDiv.style.display = 'block';
+                }
+            }, 500);
+
+            // القلوب
+            setInterval(() => {
+                const h = document.createElement('div');
+                h.className = 'heart';
+                h.innerHTML = '❤️';
+                h.style.left = Math.random() * 100 + 'vw';
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 4000);
+            }, 300);
+        };
+    </script>
+</body>
+</html>
