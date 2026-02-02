@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBD RENAD ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&family=Montserrat:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background-color: #050505;
+            color: white;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            min-height: 100vh;
+            font-family: 'Cairo', sans-serif;
+            overflow: hidden;
+        }
+
+        #fireworks-canvas {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        .main-card {
+            text-align: center;
+            background: rgba(15, 15, 15, 0.9);
+            padding: 40px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 77, 109, 0.3);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+            width: 85%; max-width: 500px;
+            z-index: 10; position: relative;
+        }
+
+        h1 { color: #fff; font-size: 1.8rem; margin-bottom: 30px; text-shadow: 0 0 10px #ff4d6d; }
+
+        .cake-container { position: relative; margin: 60px auto 40px; width: 180px; height: 120px; }
+        .cake-bottom { position: absolute; width: 180px; height: 60px; background: #ff4d6d; bottom: 0; border-radius: 50px / 25px; box-shadow: 0 5px 0 #d63351; }
+        .cake-middle { position: absolute; width: 140px; height: 50px; background: #ff758f; bottom: 30px; left: 20px; border-radius: 40px / 20px; z-index: 2; }
+        .cake-top { position: absolute; width: 100px; height: 40px; background: #ffccd5; bottom: 60px; left: 40px; border-radius: 30px / 15px; z-index: 3; }
+        .candle { position: absolute; width: 10px; height: 45px; background: #ffd700; top: -20px; left: 85px; z-index: 4; border-radius: 5px; }
+        .flame { width: 16px; height: 24px; background: #ffcc00; border-radius: 50%; position: absolute; top: -28px; left: -3px; animation: flicker 0.1s infinite alternate; box-shadow: 0 0 20px #ffcc00; }
+
+        @keyframes flicker { 0% { transform: scale(1); } 100% { transform: scale(1.2); } }
+
+        #name-display {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 4.5rem; font-weight: 900;
+            color: #fff; letter-spacing: 8px;
+            margin: 20px 0; height: 90px;
+            text-shadow: 0 0 10px #ff4d6d, 0 0 30px #ff4d6d;
+        }
+
+        .btn-start {
+            background: linear-gradient(45deg, #ff4d6d, #ff758f);
+            color: white; border: none; padding: 18px 50px; border-radius: 50px;
+            font-size: 1.5rem; cursor: pointer; font-weight: bold; transition: 0.4s;
+            box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
+        }
+
+        #extra-msg {
+            margin-top: 20px; font-size: 1.2rem; color: #ffccd5;
+            display: none; animation: fadeIn 2s;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <canvas id="fireworks-canvas"></canvas>
+
+    <div class="main-card">
+        <h1>HAPPY BIRTHDAY ✨</h1>
+        <div class="cake-container">
+            <div class="candle"><div class="flame"></div></div>
+            <div class="cake-top"></div><div class="cake-middle"></div><div class="cake-bottom"></div>
+        </div>
+        <div id="name-display"></div>
+        <div id="extra-msg">أحلى يوم في السنة! 🎂❤️</div>
+        <button class="btn-start" id="btn">اضغطي هنا يا ريناد 🎵</button>
+    </div>
+
+    <script>
+        const btn = document.getElementById('btn');
+        const display = document.getElementById('name-display');
+        const canvas = document.getElementById('fireworks-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function playHBD() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioContext();
+            const notes = [
+                {f: 261.63, d: 0.4}, {f: 261.63, d: 0.2}, {f: 293.66, d: 0.6}, {f: 261.63, d: 0.6}, {f: 349.23, d: 0.6}, {f: 329.63, d: 1.0},
+                {f: 261.63, d: 0.4}, {f: 261.63, d: 0.2}, {f: 293.66, d: 0.6}, {f: 261.63, d: 0.6}, {f: 392.00, d: 0.6}, {f: 349.23, d: 1.0}
+            ];
+            let time = audioCtx.currentTime;
+            notes.forEach(note => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(note.f, time);
+                gain.gain.setValueAtTime(0.1, time);
+                gain.gain.exponentialRampToValueAtTime(0.0001, time + note.d);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(time); osc.stop(time + note.d);
+                time += note.d;
+            });
+        }
+
+        btn.onclick = function() {
+            playHBD();
+            btn.style.display = 'none';
+            const name = "RENAD";
+            let i = 0;
+            const interval = setInterval(() => {
+                display.innerHTML += name[i];
+                i++;
+                if(i >= name.length) {
+                    clearInterval(interval);
+                    document.getElementById('extra-msg').style.display = 'block';
+                }
+            }, 500);
+            startFireworks();
+        };
+
+        let particles = [];
+        function startFireworks() {
+            requestAnimationFrame(updateFireworks);
+            setInterval(() => {
+                createFirework(Math.random() * canvas.width, Math.random() * (canvas.height/1.5));
+            }, 500);
+        }
+        function createFirework(x, y) {
+            const colors = ['#ff4d6d', '#00f2ff', '#ffd700', '#ffffff'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            for (let i = 0; i < 40; i++) {
+                particles.push({ x: x, y: y, dx: (Math.random() - 0.5) * 10, dy: (Math.random() - 0.5) * 10, size: Math.random() * 3, color: color, life: 80 });
+            }
+        }
+        function updateFireworks() {
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, index) => {
+                p.x += p.dx; p.y += p.dy; p.dy += 0.05; p.life--;
+                ctx.fillStyle = p.color;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+                if (p.life <= 0) particles.splice(index, 1);
+            });
+            requestAnimationFrame(updateFireworks);
+        }
+    </script>
+</body>
+</html>
